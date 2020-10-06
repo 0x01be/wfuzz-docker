@@ -6,6 +6,8 @@ COPY --from=build /opt/wfuzz/ /opt/wfuzz/
 
 RUN apk add --no-cache --virtual wfuww-runtime-dependecies \
     python3 \
+    py3-setuptools \
+    py3-chardet \
     curl
 
 RUN adduser -D -u 1000 wfuzz
