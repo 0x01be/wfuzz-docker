@@ -1,17 +1,19 @@
-FROM alpine as build
+FROM 0x01be/wfuzz:build as build
 
-RUN apk add --no-cache --virtual wfuww-build-dependecies \
-    git \
-    build-base \
-    python3-dev \
-    py3-pip \
-    py3-wheel \
-    curl-dev
+FROM alpine
 
-ENV WFUZZ_REVISION master
-RUN git clone --depth 1 --branch ${WFUZZ_REVISION} https://github.com/xmendez/wfuzz.git /wfuzz
+COPY --from=build /opt/wfuzz/ /opt/wfuzz/
 
-WORKDIR /wfuzz
+RUN apk add --no-cache --virtual wfuww-runtime-dependecies \
+    python3 \
+    curl
 
-RUN pip3 install --prefix=/opt/wfuzz .
+RUN adduser -D -u 1000 wfuzz
+
+USER wfuzz
+
+ENV PATH ${PATH}:/opt/wfuzz/bin/
+ENV PYTHONPATH /opt/wfuzz/lib/python3.8/site-packages/
+
+CMD "wfuzz"
 
